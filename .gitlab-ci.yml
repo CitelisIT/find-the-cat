@@ -1,0 +1,96 @@
+image: racouchot/projet_sys22
+
+stages:
+  - build
+  - test
+
+build:
+  stage: build
+  before_script:
+    # Copie des tests et arbre au bon endroit
+    - mkdir tests
+    - cp /tests/* tests
+    - mkdir arbre
+    - cp -r /arbre/* arbre
+    - test -e make
+  script:
+    - Makefile
+  after_script:
+    - ./tests/file_exist ftc
+  artifacts:
+    paths:
+      - ./ftc
+      - ./arbre
+      - ./tests
+
+
+
+test-arguments:
+  stage: test
+  script:
+    - ./tests/test_args
+  dependencies: 
+    - build
+
+test-parkour:
+  stage: test
+  script:
+    - ./tests/test_parkour
+  dependencies: 
+    - build
+    
+test-name:
+  stage: test
+  script:
+    - ./tests/test_name
+  dependencies: 
+    - build
+
+test-size:
+  stage: test
+  script:
+    - ./tests/test_size
+  dependencies: 
+    - build
+
+test-date:
+  stage: test
+  script:
+    - ./tests/test_date
+  dependencies: 
+    - build
+
+test-mime:
+  stage: test
+  script:
+    - ./tests/test_mime
+  dependencies: 
+    - build
+
+test-regex:
+  stage: test
+  script:
+    - ./tests/test_regex
+  dependencies: 
+    - build
+
+test-ftc:
+  stage: test
+  script:
+    - ./tests/test_grep
+  dependencies: 
+    - build
+
+test-dir:
+  stage: test
+  script:
+    - ./tests/test_dir
+  dependencies: 
+    - build
+
+test-perm:
+  stage: test
+  script:
+    - ./tests/test_perm
+  dependencies: 
+    - build
