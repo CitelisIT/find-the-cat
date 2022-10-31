@@ -12,9 +12,9 @@ build:
     - cp /tests/* tests
     - mkdir arbre
     - cp -r /arbre/* arbre
-    - test -e make
+    - test -e Makefile
   script:
-    - Makefile
+    - make
   after_script:
     - ./tests/file_exist ftc
   artifacts:
