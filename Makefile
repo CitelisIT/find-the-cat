@@ -9,7 +9,7 @@ RUN_ENV=LSAN_OPTIONS=suppressions=lsan.ignore:print_suppressions=0 ASAN_OPTIONS=
 #RUN_ENV=ASAN_OPTIONS=detect_leaks=1:symbolize=1
 #RUN_ENV=
 
-OBJS=src/flags.o src/filesystem.o src/main.o
+OBJS=src/flags.o src/filesystem.o src/errors.o src/main.o
 OUT=ftc
 
 install: $(OBJS) $(OUT)
@@ -18,6 +18,8 @@ install: $(OBJS) $(OUT)
 src/flags.o: src/flags.h src/flags.c 
 
 src/filesystem.o: src/filesystem.h src/filesystem.c
+
+src/errors.o: src/errors.h src/errors.c
 
 src/main.o: src/main.c
 
