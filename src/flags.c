@@ -87,11 +87,11 @@ FlagsList *parse_flags(int argc, char *argv[]) {
       } else {
         // Treating boolean flags first
         if (strcmp(argv[i], "-test") == 0) {
-          add_flag(flags, TEST, "true");
+          add_flag(flags, FLAG_TEST, "true");
         } else if (strcmp(argv[i], "-color") == 0) {
-          add_flag(flags, COLOR, "true");
+          add_flag(flags, FLAG_COLOR, "true");
         } else if (strcmp(argv[i], "-ou") == 0) {
-          add_flag(flags, OU, "true");
+          add_flag(flags, FLAG_OU, "true");
         }
         // Treating flags that take a parameter
         else {
@@ -99,21 +99,21 @@ FlagsList *parse_flags(int argc, char *argv[]) {
               argv[i + 1][0] != '-') { // Next argv exists and is not a flag
             char *value = argv[i + 1];
             if (strcmp(argv[i], "-name") == 0) {
-              add_flag(flags, NAME, value);
+              add_flag(flags, FLAG_NAME, value);
             } else if (strcmp(argv[i], "-size") == 0) {
-              add_flag(flags, SIZE, value);
+              add_flag(flags, FLAG_SIZE, value);
             } else if (strcmp(argv[i], "-date") == 0) {
-              add_flag(flags, DATE, value);
+              add_flag(flags, FLAG_DATE, value);
             } else if (strcmp(argv[i], "-mime") == 0) {
-              add_flag(flags, MIME, value);
+              add_flag(flags, FLAG_MIME, value);
             } else if (strcmp(argv[i], "-ctc") == 0) {
-              add_flag(flags, CTC, value);
+              add_flag(flags, FLAG_CTC, value);
             } else if (strcmp(argv[i], "-dir") == 0) {
-              add_flag(flags, DIR_FLAG, value);
+              add_flag(flags, FLAG_DIR, value);
             } else if (strcmp(argv[i], "-perm") == 0) {
-              add_flag(flags, PERM, value);
+              add_flag(flags, FLAG_PERM, value);
             } else if (strcmp(argv[i], "-threads") == 0) {
-              add_flag(flags, THREADS, value);
+              add_flag(flags, FLAG_THREADS, value);
             }
           } else {
             // TODO : throw flag_value_not_found error

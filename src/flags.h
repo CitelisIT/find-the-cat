@@ -4,18 +4,18 @@
 #include <stdbool.h>
 
 typedef enum {
-  TEST,
-  NAME,
-  SIZE,
-  DATE,
-  MIME,
-  CTC,
-  DIR_FLAG,
-  COLOR,
-  PERM,
-  LINK,
-  THREADS,
-  OU
+  FLAG_TEST,
+  FLAG_NAME,
+  FLAG_SIZE,
+  FLAG_DATE,
+  FLAG_MIME,
+  FLAG_CTC,
+  FLAG_DIR,
+  FLAG_COLOR,
+  FLAG_PERM,
+  FLAG_LINK,
+  FLAG_THREADS,
+  FLAG_OU
 } flag_type;
 
 typedef struct {

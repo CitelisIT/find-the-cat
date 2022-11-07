@@ -54,6 +54,10 @@ int main(int argc, char *argv[]) {
     strcpy(path, argv[1]);
     FlagsList *flags = parse_flags(argc, argv);
     // TODO : make app work
+    if (flag_exists(flags, FLAG_TEST)) {
+      display_test_flag(flags);
+      return 0;
+    }
 
     // Cleanup code here (destroying allocated structures)
     free(path);
