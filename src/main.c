@@ -56,6 +56,7 @@ int main(int argc, char *argv[]) {
     // TODO : make app work
 
     // Cleanup code here (destroying allocated structures)
+    free(path);
     destroy_flags_list(flags);
   }
   return 0;
