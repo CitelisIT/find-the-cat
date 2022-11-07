@@ -31,25 +31,8 @@ typedef struct _FlagsList {
 FlagsList *create_flags_list();
 void destroy_flags_list(FlagsList *list);
 void add_flag(FlagsList *list, flag_type flag, char *value);
+bool flag_exists(FlagsList *list, flag_type flag);
 char *get_flag_value(FlagsList *list, flag_type flag);
 FlagsList *parse_flags(int argc, char *argv[]);
-
-typedef struct {
-  bool test;
-  char *name;
-  char *size;
-  char *date;
-  char *mime;
-  char *ctc;
-  char *dir;
-  bool color;
-  char *perm;
-  bool link;
-  int threads;
-  bool ou;
-} Flags;
-
-Flags *init_flags();
-Flags *parse(int argc, char *argv[]);
 
 #endif
