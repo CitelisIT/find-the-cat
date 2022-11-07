@@ -131,3 +131,16 @@ FlagsList *parse_flags(int argc, char *argv[]) {
     return NULL;
   }
 }
+
+void display_test_flag(FlagsList *list) {
+  if (list->next == NULL || list->next->flag == NULL) {
+    return;
+  } else {
+    Flag *flag = list->next->flag;
+    const char *flag_strings[] = {"-test", "-name", "-size",    "-date",
+                                  "-mime", "-ctc",  "-dir",     "-color",
+                                  "-perm", "-link", "-threads", "-ou"};
+    printf("La valeur du flag %s est %s\n", flag_strings[flag->type],
+           flag->value);
+  }
+}
