@@ -38,10 +38,10 @@ void add_flag(FlagsList *list, flag_type type, char *value) {
     FlagsList *tmp = list;
     while (tmp->next != NULL) {
       tmp = tmp->next;
-      FlagsList *next_flag = create_flags_list();
-      add_flag(next_flag, type, value);
-      tmp->next = next_flag;
     }
+    FlagsList *next_flag = create_flags_list();
+    add_flag(next_flag, type, value);
+    tmp->next = next_flag;
   }
 }
 
