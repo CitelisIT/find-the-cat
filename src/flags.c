@@ -90,6 +90,7 @@ FlagsList *parse_flags(int argc, char *argv[]) {
           add_flag(flags, FLAG_TEST, "true");
         } else if (strcmp(argv[i], "-color") == 0) {
           add_flag(flags, FLAG_COLOR, "true");
+          error_stack->color = true;
         } else if (strcmp(argv[i], "-ou") == 0) {
           add_flag(flags, FLAG_OU, "true");
         }
