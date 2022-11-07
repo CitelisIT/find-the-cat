@@ -56,6 +56,8 @@ int main(int argc, char *argv[]) {
     // TODO : make app work
     if (flag_exists(flags, FLAG_TEST)) {
       display_test_flag(flags);
+      free(path);
+      destroy_flags_list(flags);
       return 0;
     }
 
