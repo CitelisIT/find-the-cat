@@ -1,5 +1,6 @@
 #include "errors.h"
 #include "filesystem.h"
+#include "filters.h"
 #include "flags.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -61,6 +62,15 @@ int main(int argc, char *argv[]) {
       return 0;
     }
 
+    // char *tmp = argv[0];
+    // while (tmp != NULL) {
+    //   printf("%s \n", tmp);
+    //   tmp++;
+    // }
+
+    printf("%s, %s, %d \n", get_flag_value(flags, FLAG_NAME), path,
+           strcmp(path, get_flag_value(flags, FLAG_NAME)));
+    printf("%d \n", filter_name(path, get_flag_value(flags, FLAG_NAME)));
     // Cleanup code here (destroying allocated structures)
     free(path);
     destroy_flags_list(flags);
