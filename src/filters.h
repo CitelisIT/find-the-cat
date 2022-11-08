@@ -16,8 +16,6 @@ typedef enum {
   FILTER_PERMS,
 } filter_type;
 
-typedef enum { AND, OR } logical_op;
-
 typedef struct _FilterData {
   filter_type type;
   void *value;
@@ -33,7 +31,7 @@ void destroy_filter_list(FilterList *list);
 void add_filter(FilterList *list, filter_type type, void *value);
 void remove_filter(FilterList *list, filter_type type);
 bool filter_match(char *filename, FilterData *data);
-bool filter_logical_match(logical_op logical, char *filename, FilterList *list);
+bool all_filters_match(char *filename, FilterList *list);
 
 bool filter_name(char *filename, char *value);
 

@@ -1,9 +1,13 @@
 #include "filters.h"
+#include "context.h"
 #include <regex.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
+
+// Default context
+AppContext app_context = {false, false, 1, AND};
 
 FilterList *create_filter_list() {
   FilterList *list = malloc(sizeof(FilterList));
@@ -93,12 +97,23 @@ bool filter_match(char *filename, FilterData *data) {
   }
 }
 
-bool filter_logical_match(logical_op logical, char *filename,
-                          FilterList *list) {
-  // TODO
+bool all_filters_match(char *filename, FilterList *list) {
+  switch (app_context.filter_type) {
+  case AND:
+    // TODO
+    break;
+
+  case OR:
+    // TODO
+    break;
+
+  default:
+    // Cases where filter_type is not set, throws an error
+    // TODO
+    break;
+  }
   return true;
 }
-
 bool filter_name(char *filename, char *value) {
   regex_t regex;
   int match_res;
