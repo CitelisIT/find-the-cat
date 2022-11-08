@@ -1,4 +1,4 @@
-image: racouchot/projet_sys22
+image: gl-registry.telecomnancy.univ-lorraine.fr/rs2022/ci-test
 
 stages:
   - build
