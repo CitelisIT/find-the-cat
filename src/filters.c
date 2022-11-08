@@ -1,7 +1,9 @@
 #include "filters.h"
+#include <regex.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
 
 FilterList *create_filter_list() {
   FilterList *list = malloc(sizeof(FilterList));
@@ -58,7 +60,7 @@ void remove_filter(FilterList *list, filter_type type) {
 bool filter_match(char *filename, FilterData *data) {
   switch (data->type) {
   case FILTER_NAME:
-    return strcmp(filename, data->value) == 0;
+    return filter_name(filename, (char *)data->value);
   case FILTER_SIZE_EQ:
     // TODO
     return false;
@@ -89,4 +91,19 @@ bool filter_logical_match(logical_op logical, char *filename,
                           FilterList *list) {
   // TODO
   return true;
+}
+
+bool filter_name(char *filename, char *value) {
+  regex_t regex;
+  int match_res;
+
+  if (regcomp(&regex, value, REG_EXTENDED))
+    fprintf(stderr, "Regex not compiled");
+  match_res = regexec(&regex, filename, 0, NULL, 0);
+  regfree(&regex);
+  if (match_res == REG_NOMATCH) {
+    return false;
+  } else {
+    return true;
+  }
 }
