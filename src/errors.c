@@ -79,7 +79,7 @@ void unknown_flag_error(char *flag, bool color) {
             "unknown.\n",
             flag);
   } else {
-    fprintf(stderr, "Error: flag %s in unknown.\n", flag);
+    fprintf(stderr, "Le flag %s n'est pas correct\n", flag);
   }
 }
 
@@ -90,7 +90,7 @@ void flag_value_not_found_error(char *flag, bool color) {
             "\x1b[1m\x1b[33m%s\x1b[0m.\n",
             flag);
   } else {
-    fprintf(stderr, "Error: no value vas provided for flag %s.\n", flag);
+    fprintf(stderr, "Le flag %s n'est pas correct\n", flag);
   }
 }
 

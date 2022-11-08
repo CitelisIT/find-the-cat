@@ -1,5 +1,8 @@
 #include "flags.h"
 #include "errors.h"
+#include <ctype.h>
+#include <getopt.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -77,62 +80,111 @@ char *get_flag_value(FlagsList *list, flag_type flag) {
   }
 }
 
+#define NAME_FROM_OPT(opt) (options[(opt)].name)
+#define FLAG_ERROR(flag) printf("Le flag %s n'est pas correct", (flag))
+#define PRINT_FLAG_VALUE(flag, value)                                          \
+  printf("La valeur du flag -%s est %s\n", (flag), (value))
+#define ARG_IS_FLAG(arg) (arg[0] == '-')
+
 FlagsList *parse_flags(int argc, char *argv[]) {
   FlagsList *flags = create_flags_list();
-  ErrorStack *error_stack = create_error_stack();
-  for (int i = 2; i < argc; i++) {
-    if (argv[i][0] == '-') { // The argv is a flag
-      if (!_is_app_flag(argv[i])) {
-        add_error(error_stack, create_error(FLAG_UNKNOWN, argv[i], NULL));
-      } else {
-        // Treating boolean flags first
-        if (strcmp(argv[i], "-test") == 0) {
-          add_flag(flags, FLAG_TEST, "true");
-        } else if (strcmp(argv[i], "-color") == 0) {
-          add_flag(flags, FLAG_COLOR, "true");
-          error_stack->color = true;
-        } else if (strcmp(argv[i], "-ou") == 0) {
-          add_flag(flags, FLAG_OU, "true");
-        }
-        // Treating flags that take a parameter
-        else {
-          if (argv[i + 1] != NULL &&
-              argv[i + 1][0] != '-') { // Next argv exists and is not a flag
-            char *value = argv[i + 1];
-            if (strcmp(argv[i], "-name") == 0) {
-              add_flag(flags, FLAG_NAME, value);
-            } else if (strcmp(argv[i], "-size") == 0) {
-              add_flag(flags, FLAG_SIZE, value);
-            } else if (strcmp(argv[i], "-date") == 0) {
-              add_flag(flags, FLAG_DATE, value);
-            } else if (strcmp(argv[i], "-mime") == 0) {
-              add_flag(flags, FLAG_MIME, value);
-            } else if (strcmp(argv[i], "-ctc") == 0) {
-              add_flag(flags, FLAG_CTC, value);
-            } else if (strcmp(argv[i], "-dir") == 0) {
-              add_flag(flags, FLAG_DIR, value);
-            } else if (strcmp(argv[i], "-perm") == 0) {
-              add_flag(flags, FLAG_PERM, value);
-            } else if (strcmp(argv[i], "-threads") == 0) {
-              add_flag(flags, FLAG_THREADS, value);
-            }
-          } else {
-            // TODO : throw flag_value_not_found error
-            add_error(error_stack, create_error(FLAG_NO_VALUE, argv[i], NULL));
-          }
-        }
+  static struct option options[] = {
+      {"test", no_argument, 0, 't'},
+      {"name", required_argument, 0, 'n'},
+      {"size", required_argument, 0, 's'},
+      {"date", required_argument, 0, 'd'},
+      {"mime", required_argument, 0, 'm'},
+      {"ctc", required_argument, 0, 'g'},
+      {"dir", optional_argument, 0, 'f'},
+      {"color", no_argument, 0, 'c'},
+      {"perm", required_argument, 0, 'p'},
+      {"link", no_argument, 0, 'l'},
+      {"threads", required_argument, 0, 'x'},
+      {"ou", no_argument, 0, 'o'},
+      {0, 0, 0, 0},
+  };
+  opterr = 0;
+  int opt;
+  int opt_index = 0;
+  while ((opt = getopt_long_only(argc, argv, "", options, &opt_index)) != -1) {
+    switch (opt) {
+    case 't':
+      add_flag(flags, FLAG_TEST, "true");
+      break;
+    case 'n':
+      if (ARG_IS_FLAG(optarg)) {
+        FLAG_ERROR(NAME_FROM_OPT(opt_index));
+        exit(1);
       }
+      add_flag(flags, FLAG_NAME, optarg);
+      break;
+    case 's':
+      if (ARG_IS_FLAG(optarg)) {
+        FLAG_ERROR(NAME_FROM_OPT(opt_index));
+        exit(1);
+      }
+      add_flag(flags, FLAG_SIZE, optarg);
+      break;
+    case 'd':
+      if (ARG_IS_FLAG(optarg)) {
+        FLAG_ERROR(NAME_FROM_OPT(opt_index));
+        exit(1);
+      }
+      add_flag(flags, FLAG_DATE, optarg);
+      break;
+    case 'm':
+      if (ARG_IS_FLAG(optarg)) {
+        FLAG_ERROR(NAME_FROM_OPT(opt_index));
+        exit(1);
+      }
+      add_flag(flags, FLAG_MIME, optarg);
+      break;
+    case 'g':
+      if (ARG_IS_FLAG(optarg)) {
+        FLAG_ERROR(NAME_FROM_OPT(opt_index));
+        exit(1);
+      }
+      add_flag(flags, FLAG_CTC, optarg);
+      break;
+    case 'f':
+      if (optarg == NULL && argv[optind] != NULL &&
+          !ARG_IS_FLAG(argv[optind])) {
+        add_flag(flags, FLAG_DIR, argv[optind]);
+        optind++;
+      } else {
+        add_flag(flags, FLAG_DIR, "");
+      }
+      break;
+    case 'c':
+      add_flag(flags, FLAG_COLOR, "true");
+      break;
+    case 'p':
+      if (ARG_IS_FLAG(optarg)) {
+        FLAG_ERROR(NAME_FROM_OPT(opt_index));
+        exit(1);
+      }
+      add_flag(flags, FLAG_PERM, optarg);
+      break;
+    case 'l':
+      add_flag(flags, FLAG_LINK, "true");
+      break;
+    case 'x':
+      if (ARG_IS_FLAG(optarg)) {
+        FLAG_ERROR(NAME_FROM_OPT(opt_index));
+        exit(1);
+      }
+      add_flag(flags, FLAG_THREADS, optarg);
+      break;
+    case 'o':
+      add_flag(flags, FLAG_OU, "true");
+      break;
+    case '?':
+      FLAG_ERROR(argv[optind - 1]);
+      exit(1);
     }
   }
-  if (no_error(error_stack)) {
-    free_error_stack(error_stack);
-    return flags;
-  } else {
-    throw_stack(error_stack);
-    return NULL;
-  }
+  return flags;
 }
-
 void display_test_flag(FlagsList *list) {
   if (list->next == NULL || list->next->flag == NULL) {
     return;
