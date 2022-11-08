@@ -85,6 +85,9 @@ bool filter_match(char *filename, FilterData *data) {
   case FILTER_DIR:
     // TODO
     return false;
+  case FILTER_PERMS:
+    // TODO
+    return false;
   default:
     return false;
   }
