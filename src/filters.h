@@ -11,7 +11,8 @@ typedef enum {
   FILTER_DATE_GT,
   FILTER_DATE_LT,
   FILTER_MIME,
-  FILTER_CTC
+  FILTER_CTC,
+  FILTER_DIR
 } filter_type;
 
 typedef enum { AND, OR } logical_op;

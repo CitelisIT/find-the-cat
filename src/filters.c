@@ -82,6 +82,9 @@ bool filter_match(char *filename, FilterData *data) {
   case FILTER_CTC:
     // TODO
     return false;
+  case FILTER_DIR:
+    // TODO
+    return false;
   default:
     return false;
   }
