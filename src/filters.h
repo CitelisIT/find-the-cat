@@ -3,6 +3,7 @@
 
 #include "flags.h"
 #include <stdbool.h>
+#include <time.h>
 
 typedef enum {
   FILTER_NAME,
@@ -39,5 +40,16 @@ bool filter_name(char *filename, char *value);
 bool filter_size_eq(char *filename, long value);
 bool filter_size_gt(char *filename, long value);
 bool filter_size_lt(char *filename, long value);
+
+bool filter_date_gt(char *filename, time_t date);
+bool filter_date_lt(char *filename, time_t date);
+
+bool filter_mime(char *filename, char *mimetype);
+
+bool filter_ctc(char *filename, char *ctc);
+
+bool filter_dir(char *filename, char *value);
+
+bool filter_perms(char *filename, char *value);
 
 #endif // _FILTERS_H_

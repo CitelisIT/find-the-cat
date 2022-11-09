@@ -1,4 +1,5 @@
 #include "filters.h"
+#include "../lib/MegaMimes/MegaMimes.h"
 #include "context.h"
 #include "flags.h"
 #include <ctype.h>
@@ -8,6 +9,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <time.h>
 
 FilterList *create_filter_list() {
   FilterList *list = malloc(sizeof(FilterList));
@@ -83,6 +85,7 @@ bool _is_perm(char *value) {
 
 FilterList *flags_to_filters(FlagsList *flags) {
   FilterList *filters = create_filter_list();
+  int _true = 1;
   long size;
   long date;
   char *unit;
@@ -232,23 +235,17 @@ bool filter_match(char *filename, FilterData *data) {
   case FILTER_NAME:
     return filter_name(filename, (char *)data->value);
   case FILTER_SIZE_EQ:
-    // TODO
-    return false;
+    return filter_size_eq(filename, (long *)data->value);
   case FILTER_SIZE_GT:
-    // TODO
-    return false;
+    return filter_size_gt(filename, (long *)data->value);
   case FILTER_SIZE_LT:
-    // TODO
-    return false;
+    return filter_size_lt(filename, (long *)data->value);
   case FILTER_DATE_GT:
-    // TODO
-    return false;
+    return filter_date_gt(filename, (long *)data->value);
   case FILTER_DATE_LT:
-    // TODO
-    return false;
+    return filter_date_lt(filename, (long *)data->value);
   case FILTER_MIME:
-    // TODO
-    return false;
+    return filter_mime(filename, (char *)data->value);
   case FILTER_CTC:
     // TODO
     return false;
@@ -317,4 +314,47 @@ bool filter_size_eq(char *path, long value) {
     exit(1);
   }
   return file_stat.st_size == value;
+}
+
+bool filter_size_gt(char *path, long value) {
+  struct stat file_stat;
+  if (stat(path, &file_stat) == -1) {
+    fprintf(stderr, "Error while getting file stats \n");
+    exit(1);
+  }
+  return file_stat.st_size > value;
+}
+
+bool filter_size_lt(char *path, long value) {
+  struct stat file_stat;
+  if (stat(path, &file_stat) == -1) {
+    fprintf(stderr, "Error while getting file stats \n");
+    exit(1);
+  }
+  return file_stat.st_size < value;
+}
+
+bool filter_date_gt(char *path, time_t date) {
+  struct stat file_stat;
+  if (stat(path, &file_stat) == -1) {
+    fprintf(stderr, "Error while getting file stats \n");
+    exit(1);
+  }
+  time_t actual_time = time(NULL);
+  return (actual_time - file_stat.st_mtime) > date;
+}
+
+bool filter_date_lt(char *path, time_t date) {
+  struct stat file_stat;
+  if (stat(path, &file_stat) == -1) {
+    fprintf(stderr, "Error while getting file stats \n");
+    exit(1);
+  }
+  time_t actual_time = time(NULL);
+  return (actual_time - file_stat.st_mtime) < date;
+}
+
+bool filter_mime(char *path, char *mimetime) {
+  char *mime = getMegaMimeType(path);
+  return strcmp(mime, mimetime) == 0;
 }
