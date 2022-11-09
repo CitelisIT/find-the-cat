@@ -1,6 +1,7 @@
 #ifndef _FILTERS_H_
 #define _FILTERS_H_
 
+#include "flags.h"
 #include <stdbool.h>
 
 typedef enum {
@@ -30,6 +31,7 @@ FilterList *create_filter_list();
 void destroy_filter_list(FilterList *list);
 void add_filter(FilterList *list, filter_type type, void *value);
 void remove_filter(FilterList *list, filter_type type);
+FilterList *flags_to_filters(FlagsList *flags);
 bool filter_match(char *filename, FilterData *data);
 bool all_filters_match(char *filename, FilterList *list);
 

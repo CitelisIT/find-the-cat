@@ -84,7 +84,6 @@ char *get_flag_value(FlagsList *list, flag_type flag) {
 #define FLAG_ERROR(flag) printf("Le flag %s n'est pas correct", (flag))
 #define PRINT_FLAG_VALUE(flag, value)                                          \
   printf("La valeur du flag -%s est %s\n", (flag), (value))
-#define ARG_IS_FLAG(arg) (arg[0] == '-')
 
 FlagsList *parse_flags(int argc, char *argv[]) {
   FlagsList *flags = create_flags_list();
@@ -112,35 +111,35 @@ FlagsList *parse_flags(int argc, char *argv[]) {
       add_flag(flags, FLAG_TEST, "true");
       break;
     case 'n':
-      if (ARG_IS_FLAG(optarg)) {
+      if (_is_app_flag(optarg)) {
         FLAG_ERROR(NAME_FROM_OPT(opt_index));
         exit(1);
       }
       add_flag(flags, FLAG_NAME, optarg);
       break;
     case 's':
-      if (ARG_IS_FLAG(optarg)) {
+      if (_is_app_flag(optarg)) {
         FLAG_ERROR(NAME_FROM_OPT(opt_index));
         exit(1);
       }
       add_flag(flags, FLAG_SIZE, optarg);
       break;
     case 'd':
-      if (ARG_IS_FLAG(optarg)) {
+      if (_is_app_flag(optarg)) {
         FLAG_ERROR(NAME_FROM_OPT(opt_index));
         exit(1);
       }
       add_flag(flags, FLAG_DATE, optarg);
       break;
     case 'm':
-      if (ARG_IS_FLAG(optarg)) {
+      if (_is_app_flag(optarg)) {
         FLAG_ERROR(NAME_FROM_OPT(opt_index));
         exit(1);
       }
       add_flag(flags, FLAG_MIME, optarg);
       break;
     case 'g':
-      if (ARG_IS_FLAG(optarg)) {
+      if (_is_app_flag(optarg)) {
         FLAG_ERROR(NAME_FROM_OPT(opt_index));
         exit(1);
       }
@@ -148,7 +147,7 @@ FlagsList *parse_flags(int argc, char *argv[]) {
       break;
     case 'f':
       if (optarg == NULL && argv[optind] != NULL &&
-          !ARG_IS_FLAG(argv[optind])) {
+          !_is_app_flag(argv[optind])) {
         add_flag(flags, FLAG_DIR, argv[optind]);
         optind++;
       } else {
@@ -159,7 +158,7 @@ FlagsList *parse_flags(int argc, char *argv[]) {
       add_flag(flags, FLAG_COLOR, "true");
       break;
     case 'p':
-      if (ARG_IS_FLAG(optarg)) {
+      if (_is_app_flag(optarg)) {
         FLAG_ERROR(NAME_FROM_OPT(opt_index));
         exit(1);
       }
@@ -169,7 +168,7 @@ FlagsList *parse_flags(int argc, char *argv[]) {
       add_flag(flags, FLAG_LINK, "true");
       break;
     case 'x':
-      if (ARG_IS_FLAG(optarg)) {
+      if (_is_app_flag(optarg)) {
         FLAG_ERROR(NAME_FROM_OPT(opt_index));
         exit(1);
       }
