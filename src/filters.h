@@ -36,5 +36,8 @@ bool filter_match(char *filename, FilterData *data);
 bool all_filters_match(char *filename, FilterList *list);
 
 bool filter_name(char *filename, char *value);
+bool filter_size_eq(char *filename, long value);
+bool filter_size_gt(char *filename, long value);
+bool filter_size_lt(char *filename, long value);
 
 #endif // _FILTERS_H_

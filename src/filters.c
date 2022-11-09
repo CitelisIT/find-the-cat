@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 #include <sys/types.h>
 
 FilterList *create_filter_list() {
@@ -298,4 +299,13 @@ bool filter_name(char *filename, char *value) {
   } else {
     return true;
   }
+}
+
+bool filter_size_eq(char *path, long value) {
+  struct stat file_stat;
+  if (stat(path, &file_stat) == -1) {
+    fprintf(stderr, "Error while getting file stats \n");
+    exit(1);
+  }
+  return file_stat.st_size == value;
 }
