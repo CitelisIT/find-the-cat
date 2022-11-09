@@ -1,4 +1,4 @@
-image: gl-registry.telecomnancy.univ-lorraine.fr/rs2022/ci-test
+image: gl-registry.telecomnancy.univ-lorraine.fr/christophe.bouthier/rs2022-dockertest
 
 stages:
   - build
