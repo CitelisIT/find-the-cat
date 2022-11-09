@@ -1,6 +1,9 @@
 #include "context.h"
 #include <stdbool.h>
 
+// Default context
+AppContext app_context = {false, false, 1, AND};
+
 void set_color() { app_context.color = true; }
 
 void set_follow_links() { app_context.follow_links = true; }

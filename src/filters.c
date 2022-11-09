@@ -6,9 +6,6 @@
 #include <string.h>
 #include <sys/types.h>
 
-// Default context
-AppContext app_context = {false, false, 1, AND};
-
 FilterList *create_filter_list() {
   FilterList *list = malloc(sizeof(FilterList));
   list->data = NULL;
