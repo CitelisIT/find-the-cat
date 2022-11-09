@@ -83,7 +83,6 @@ bool _is_perm(char *value) {
 
 FilterList *flags_to_filters(FlagsList *flags) {
   FilterList *filters = create_filter_list();
-  int _true = 1;
   long size;
   long date;
   char *unit;
@@ -194,7 +193,7 @@ FilterList *flags_to_filters(FlagsList *flags) {
       add_filter(filters, FILTER_CTC, value);
       break;
     case FLAG_DIR:
-      add_filter(filters, FILTER_DIR, &_true);
+      add_filter(filters, FILTER_DIR, value);
       break;
     case FLAG_COLOR:
       set_color(true);
@@ -267,19 +266,29 @@ bool filter_match(char *filename, FilterData *data) {
 bool all_filters_match(char *filename, FilterList *list) {
   switch (app_context.filter_type) {
   case AND:
-    // TODO
+    while (list != NULL) {
+      if (!filter_match(filename, list->data))
+        return false;
+      else
+        list = list->next;
+    }
+    return true;
     break;
-
   case OR:
-    // TODO
+    while (list != NULL) {
+      if (filter_match(filename, list->data))
+        return true;
+      else
+        list = list->next;
+    }
+    return false;
     break;
-
   default:
     // Cases where filter_type is not set, throws an error
-    // TODO
+    fprintf(stderr, "App error: filtering type is not set\n");
+    exit(1);
     break;
   }
-  return true;
 }
 
 bool filter_name(char *filename, char *value) {
