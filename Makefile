@@ -1,7 +1,7 @@
 CC=/usr/bin/clang
 LDFLAGS=-L/lib 
 CPPFLAGS=-I/include
-CFLAGS=-std=c99 -Wall -Wextra -Werror -Wno-error=unused-parameter -Wno-error=unused-but-set-variable -pedantic -fdiagnostics-color=always
+CFLAGS=-std=c99 -Wall -Wextra -pedantic -fdiagnostics-color=always
 CFLAGS+=$(CPPFLAGS) -O0 -g3 -Qunused-arguments # -DNDEBUG
 
 OBJS=src/main.o src/flags.o src/filesystem.o src/errors.o src/filters.o src/context.o
