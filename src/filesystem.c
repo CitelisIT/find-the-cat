@@ -1,6 +1,5 @@
-#define _DEFAULT_SOURCE
 #include "filesystem.h"
-#include <dirent.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 char *join_path(const char *base, const char *filename) {
@@ -12,62 +11,29 @@ char *join_path(const char *base, const char *filename) {
   return joined;
 }
 
-FileTree *make_tree_node(char *path) {
-  FileTree *tree = calloc(1, sizeof(FileTree));
-  tree->path = path;
-  return tree;
-}
-
-FileTree *_append_sibling(FileTree *root, char *path) {
-  if (root->path == NULL) {
-    root->path = path;
-    return root;
-  }
-  FileTree *tmp = root;
-  while (tmp->sibling != NULL) {
-    tmp = tmp->sibling;
-  }
-  tmp->sibling = make_tree_node(path);
-  return tmp->sibling;
-}
-
-FileTree *_list_directory(char *path) {
+void find_matching_files(char *path, FilterList *filters) {
   DIR *dirp = opendir(path);
+  char *filename;
   if (dirp == NULL) {
-    // TODO : throw dir_error
+    fprintf(stderr, "Could not open dir %s\n", path);
     exit(1);
   }
-  FileTree *root = calloc(1, sizeof(FileTree));
-  FileTree *curr_node;
   struct dirent *curr_dirent = readdir(dirp);
   while (curr_dirent != NULL) {
-    if (strcmp(curr_dirent->d_name, ".") != 0 &&
-        strcmp(curr_dirent->d_name, "..") != 0) {
-      char *dir_name = join_path(path, curr_dirent->d_name);
-      curr_node = _append_sibling(root, dir_name);
+    filename = curr_dirent->d_name;
+    if (strcmp(filename, ".") != 0 && strcmp(filename, "..") != 0) {
+      char *joined_path = join_path(path, filename);
+      if (all_filters_match(joined_path, filters)) {
+        printf("%s\n", joined_path);
+      }
       if (curr_dirent->d_type == DT_DIR) {
-        curr_node->child = _list_directory(dir_name);
+        find_matching_files(joined_path, filters);
+      } else {
+        free(joined_path);
       }
     }
     curr_dirent = readdir(dirp);
   }
   closedir(dirp);
-  return root;
-}
-
-FileTree *construct_file_tree(char *base_path) {
-  FileTree *tree = make_tree_node(base_path);
-  tree->child = _list_directory(base_path);
-  return tree;
-}
-
-void destroy_file_tree(FileTree *tree) {
-  if (tree->child != NULL) {
-    destroy_file_tree(tree->child);
-  }
-  if (tree->sibling != NULL) {
-    destroy_file_tree(tree->sibling);
-  }
-  free(tree->path);
-  free(tree);
+  free(path);
 }
