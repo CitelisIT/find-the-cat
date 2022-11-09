@@ -82,7 +82,6 @@ bool _is_perm(char *value) {
 
 FilterList *flags_to_filters(FlagsList *flags) {
   FilterList *filters = create_filter_list();
-  int _true = 1;
   long size;
   long date;
   char *unit;
@@ -193,7 +192,7 @@ FilterList *flags_to_filters(FlagsList *flags) {
       add_filter(filters, FILTER_CTC, value);
       break;
     case FLAG_DIR:
-      add_filter(filters, FILTER_DIR, &_true);
+      add_filter(filters, FILTER_DIR, value);
       break;
     case FLAG_COLOR:
       set_color(true);
