@@ -265,19 +265,29 @@ bool filter_match(char *filename, FilterData *data) {
 bool all_filters_match(char *filename, FilterList *list) {
   switch (app_context.filter_type) {
   case AND:
-    // TODO
+    while (list != NULL) {
+      if (!filter_match(filename, list->data))
+        return false;
+      else
+        list = list->next;
+    }
+    return true;
     break;
-
   case OR:
-    // TODO
+    while (list != NULL) {
+      if (filter_match(filename, list->data))
+        return true;
+      else
+        list = list->next;
+    }
+    return false;
     break;
-
   default:
     // Cases where filter_type is not set, throws an error
-    // TODO
+    fprintf(stderr, "App error: filtering type is not set\n");
+    exit(1);
     break;
   }
-  return true;
 }
 
 bool filter_name(char *filename, char *value) {
