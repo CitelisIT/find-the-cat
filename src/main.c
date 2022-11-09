@@ -61,10 +61,12 @@ int main(int argc, char *argv[]) {
       destroy_flags_list(flags);
       return 0;
     }
-
+    FilterList *filters = flags_to_filters(flags);
+    find_matching_files(path, filters);
     // Cleanup code here (destroying allocated structures)
-    free(path);
+    /* free(path); */
     destroy_flags_list(flags);
+    destroy_filter_list(filters);
   }
   return 0;
 }

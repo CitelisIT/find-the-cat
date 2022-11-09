@@ -91,7 +91,7 @@ FilterList *flags_to_filters(FlagsList *flags) {
   char *unit;
   int perms;
   char *value;
-  while (flags != NULL) {
+  while (flags != NULL && flags->flag != NULL) {
     value = flags->flag->value;
     switch (flags->flag->type) {
     case FLAG_TEST:
@@ -263,7 +263,7 @@ bool filter_match(char *filename, FilterData *data) {
 bool all_filters_match(char *filename, FilterList *list) {
   switch (app_context.filter_type) {
   case AND:
-    while (list != NULL) {
+    while (list != NULL && list->data != NULL) {
       if (!filter_match(filename, list->data))
         return false;
       else
@@ -272,7 +272,7 @@ bool all_filters_match(char *filename, FilterList *list) {
     return true;
     break;
   case OR:
-    while (list != NULL) {
+    while (list != NULL && list->data != NULL) {
       if (filter_match(filename, list->data))
         return true;
       else
@@ -286,6 +286,7 @@ bool all_filters_match(char *filename, FilterList *list) {
     exit(1);
     break;
   }
+  return true;
 }
 
 bool filter_name(char *filename, char *value) {
