@@ -1,5 +1,5 @@
 #include "filters.h"
-#include "../lib/MegaMimes/MegaMimes.h"
+#include "../lib/MegaMimes.h"
 #include "context.h"
 #include "flags.h"
 #include <ctype.h>
@@ -235,15 +235,15 @@ bool filter_match(char *filename, FilterData *data) {
   case FILTER_NAME:
     return filter_name(filename, (char *)data->value);
   case FILTER_SIZE_EQ:
-    return filter_size_eq(filename, (long *)data->value);
+    return filter_size_eq(filename, *(long *)data->value);
   case FILTER_SIZE_GT:
-    return filter_size_gt(filename, (long *)data->value);
+    return filter_size_gt(filename, *(long *)data->value);
   case FILTER_SIZE_LT:
-    return filter_size_lt(filename, (long *)data->value);
+    return filter_size_lt(filename, *(long *)data->value);
   case FILTER_DATE_GT:
-    return filter_date_gt(filename, (long *)data->value);
+    return filter_date_gt(filename, *(long *)data->value);
   case FILTER_DATE_LT:
-    return filter_date_lt(filename, (long *)data->value);
+    return filter_date_lt(filename, *(long *)data->value);
   case FILTER_MIME:
     return filter_mime(filename, (char *)data->value);
   case FILTER_CTC:
