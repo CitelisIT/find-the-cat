@@ -18,9 +18,14 @@ typedef enum {
   FILTER_PERMS,
 } filter_type;
 
+typedef struct {
+  char *string_value;
+  long numeric_value;
+} FilterArgument;
+
 typedef struct _FilterData {
   filter_type type;
-  void *value;
+  FilterArgument *argument;
 } FilterData;
 
 typedef struct _FilterList {
@@ -30,7 +35,8 @@ typedef struct _FilterList {
 
 FilterList *create_filter_list();
 void destroy_filter_list(FilterList *list);
-void add_filter(FilterList *list, filter_type type, void *value);
+void add_filter_string(FilterList *list, filter_type type, char *value);
+void add_filter_numeric(FilterList *list, filter_type type, long value);
 void remove_filter(FilterList *list, filter_type type);
 FilterList *flags_to_filters(FlagsList *flags);
 bool filter_match(char *filename, FilterData *data);

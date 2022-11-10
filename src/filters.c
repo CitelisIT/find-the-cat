@@ -28,11 +28,13 @@ void destroy_filter_list(FilterList *list) {
   }
 }
 
-void add_filter(FilterList *list, filter_type type, void *value) {
+void add_filter_string(FilterList *list, filter_type type, char *value) {
   if (list->data == NULL) {
+    FilterArgument *argument = calloc(1, sizeof(FilterArgument));
     FilterData *data = malloc(sizeof(FilterData));
     data->type = type;
-    data->value = value;
+    argument->string_value = value;
+    data->argument = argument;
     list->data = data;
   } else {
     FilterList *tmp = list;
@@ -40,7 +42,26 @@ void add_filter(FilterList *list, filter_type type, void *value) {
       tmp = tmp->next;
     }
     FilterList *next_filter = create_filter_list();
-    add_filter(next_filter, type, value);
+    add_filter_string(next_filter, type, value);
+    tmp->next = next_filter;
+  }
+}
+
+void add_filter_numeric(FilterList *list, filter_type type, long value) {
+  if (list->data == NULL) {
+    FilterArgument *argument = calloc(1, sizeof(FilterArgument));
+    FilterData *data = malloc(sizeof(FilterData));
+    data->type = type;
+    argument->numeric_value = value;
+    data->argument = argument;
+    list->data = data;
+  } else {
+    FilterList *tmp = list;
+    while (tmp->next != NULL) {
+      tmp = tmp->next;
+    }
+    FilterList *next_filter = create_filter_list();
+    add_filter_numeric(next_filter, type, value);
     tmp->next = next_filter;
   }
 }
@@ -53,6 +74,7 @@ void remove_filter(FilterList *list, filter_type type) {
     while (tmp != NULL) {
       if (tmp->data->type == type) {
         FilterList *next = tmp->next;
+        free(tmp->data->argument);
         free(tmp->data);
         free(tmp);
         tmp = next;
@@ -86,10 +108,8 @@ bool _is_perm(char *value) {
 FilterList *flags_to_filters(FlagsList *flags) {
   FilterList *filters = create_filter_list();
   int _true = 1;
-  long size;
-  long date;
+  long num_value;
   char *unit;
-  int perms;
   char *value;
   while (flags != NULL && flags->flag != NULL) {
     value = flags->flag->value;
@@ -97,10 +117,10 @@ FilterList *flags_to_filters(FlagsList *flags) {
     case FLAG_TEST:
       break;
     case FLAG_NAME:
-      add_filter(filters, FILTER_NAME, value);
+      add_filter_string(filters, FILTER_NAME, value);
       break;
     case FLAG_SIZE:
-      size = labs(strtol(value, &unit, 10));
+      num_value = labs(strtol(value, &unit, 10));
       if (strlen(unit) != 1) {
         fprintf(stderr, "%s is not a valide size value\n", value);
         exit(1);
@@ -110,13 +130,13 @@ FilterList *flags_to_filters(FlagsList *flags) {
           // size is in bytes so don't modify the value of the variable
           break;
         case 'k':
-          size *= 1024;
+          num_value *= 1024;
           break;
         case 'M':
-          size *= 1048576;
+          num_value *= 1048576;
           break;
         case 'G':
-          size *= 1073741824;
+          num_value *= 1073741824;
           break;
         default:
           fprintf(stderr, "%s is not a valid size value\n", value);
@@ -124,10 +144,10 @@ FilterList *flags_to_filters(FlagsList *flags) {
         }
         switch (value[0]) {
         case '+':
-          add_filter(filters, FILTER_SIZE_GT, &size);
+          add_filter_numeric(filters, FILTER_SIZE_GT, num_value);
           break;
         case '-':
-          add_filter(filters, FILTER_SIZE_LT, &size);
+          add_filter_numeric(filters, FILTER_SIZE_LT, num_value);
           break;
         case '0':
         case '1':
@@ -139,7 +159,7 @@ FilterList *flags_to_filters(FlagsList *flags) {
         case '7':
         case '8':
         case '9':
-          add_filter(filters, FILTER_SIZE_EQ, &size);
+          add_filter_numeric(filters, FILTER_SIZE_EQ, num_value);
           break;
         default:
           fprintf(stderr, "%s is not a valid size value\n", value);
@@ -148,27 +168,27 @@ FilterList *flags_to_filters(FlagsList *flags) {
       }
       break;
     case FLAG_DATE:
-      date = labs(strtol(value, &unit, 10));
+      num_value = labs(strtol(value, &unit, 10));
       if (strlen(unit) != 1) {
         fprintf(stderr, "%s is not a valid date value\n", value);
         exit(1);
       } else {
         switch (unit[0]) {
         case 'm':
-          date *= 60;
+          num_value *= 60;
           break;
         case 'h':
-          date *= 3600;
+          num_value *= 3600;
           break;
         case 'j':
-          date *= 86400;
+          num_value *= 86400;
           break;
         default:
           fprintf(stderr, "%s is not a valid date value\n", value);
         }
         switch (value[0]) {
         case '+':
-          add_filter(filters, FILTER_DATE_GT, &date);
+          add_filter_numeric(filters, FILTER_DATE_GT, num_value);
           break;
         case '-':
         case '0':
@@ -181,7 +201,7 @@ FilterList *flags_to_filters(FlagsList *flags) {
         case '7':
         case '8':
         case '9':
-          add_filter(filters, FILTER_DATE_LT, &date);
+          add_filter_numeric(filters, FILTER_DATE_LT, num_value);
           break;
         default:
           fprintf(stderr, "%s is not a valid date value\n", value);
@@ -190,13 +210,13 @@ FilterList *flags_to_filters(FlagsList *flags) {
         break;
       }
     case FLAG_MIME:
-      add_filter(filters, FILTER_MIME, value);
+      add_filter_string(filters, FILTER_MIME, value);
       break;
     case FLAG_CTC:
-      add_filter(filters, FILTER_CTC, value);
+      add_filter_string(filters, FILTER_CTC, value);
       break;
     case FLAG_DIR:
-      add_filter(filters, FILTER_DIR, value);
+      add_filter_string(filters, FILTER_DIR, value);
       break;
     case FLAG_COLOR:
       set_color(true);
@@ -206,8 +226,8 @@ FilterList *flags_to_filters(FlagsList *flags) {
         fprintf(stderr, "%s is not a valid permission value\n", value);
         exit(1);
       } else {
-        perms = atoi(value);
-        add_filter(filters, FILTER_PERMS, &perms);
+        num_value = atol(value);
+        add_filter_numeric(filters, FILTER_PERMS, num_value);
       }
       break;
     case FLAG_LINK:
@@ -231,21 +251,22 @@ FilterList *flags_to_filters(FlagsList *flags) {
 }
 
 bool filter_match(char *filename, FilterData *data) {
+  FilterArgument *argument = data->argument;
   switch (data->type) {
   case FILTER_NAME:
-    return filter_name(filename, (char *)data->value);
+    return filter_name(filename, argument->string_value);
   case FILTER_SIZE_EQ:
-    return filter_size_eq(filename, *(long *)data->value);
+    return filter_size_eq(filename, argument->numeric_value);
   case FILTER_SIZE_GT:
-    return filter_size_gt(filename, *(long *)data->value);
+    return filter_size_gt(filename, argument->numeric_value);
   case FILTER_SIZE_LT:
-    return filter_size_lt(filename, *(long *)data->value);
+    return filter_size_lt(filename, argument->numeric_value);
   case FILTER_DATE_GT:
-    return filter_date_gt(filename, *(long *)data->value);
+    return filter_date_gt(filename, argument->numeric_value);
   case FILTER_DATE_LT:
-    return filter_date_lt(filename, *(long *)data->value);
+    return filter_date_lt(filename, argument->numeric_value);
   case FILTER_MIME:
-    return filter_mime(filename, (char *)data->value);
+    return filter_mime(filename, argument->string_value);
   case FILTER_CTC:
     // TODO
     return false;
