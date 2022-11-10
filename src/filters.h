@@ -54,8 +54,8 @@ bool filter_mime(char *filename, char *mimetype);
 
 bool filter_ctc(char *filename, char *ctc);
 
-bool filter_dir(char *filename, char *value);
+bool filter_dir(char *dirname, char *value);
 
-bool filter_perms(char *filename, char *value);
+bool filter_perms(char *filename, long value);
 
 #endif // _FILTERS_H_

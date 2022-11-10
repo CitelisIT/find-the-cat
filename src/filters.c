@@ -268,14 +268,11 @@ bool filter_match(char *filename, FilterData *data) {
   case FILTER_MIME:
     return filter_mime(filename, argument->string_value);
   case FILTER_CTC:
-    // TODO
-    return false;
+    return filter_ctc(filename, argument->string_value);
   case FILTER_DIR:
-    // TODO
-    return false;
+    return filter_dir(filename, argument->string_value);
   case FILTER_PERMS:
-    // TODO
-    return false;
+    return filter_perms(filename, argument->numeric_value);
   default:
     return false;
   }
@@ -379,4 +376,72 @@ bool filter_date_lt(char *path, time_t date) {
 bool filter_mime(char *path, char *mimetime) {
   char *mime = getMegaMimeType(path);
   return strcmp(mime, mimetime) == 0;
+}
+
+bool filter_ctc(char *path, char *ctc) {
+  char *buffer = 0;
+  long length;
+
+  FILE *file = fopen(path, "rb");
+
+  if (file) {
+    fseek(file, 0, SEEK_END);
+    length = ftell(file);
+    fseek(file, 0, SEEK_SET);
+    buffer = malloc(length);
+    if (buffer) {
+      fread(buffer, 1, length, file);
+    }
+    fclose(file);
+  } else {
+    fprintf(stderr, "Error while opening file %s\n", path);
+    exit(1);
+  }
+
+  if (buffer) {
+    regex_t regex;
+    int match_res;
+    char buff[128];
+
+    if ((match_res = regcomp(&regex, ctc, 0))) {
+      regerror(match_res, &regex, buff, 128);
+      fprintf(stderr, "Regex not compiled : %s\n", buff);
+      exit(1);
+    }
+    match_res = regexec(&regex, path, 0, NULL, 0);
+    regfree(&regex);
+    free(buffer);
+    if (match_res == REG_NOMATCH) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  else {
+    fprintf(stderr, "Error while reading file %s\n", path);
+    exit(1);
+  }
+}
+
+bool filter_dir(char *dirname, char *value) {
+  struct stat dir_stat;
+  if (stat(dirname, &dir_stat) == -1) {
+    fprintf(stderr, "Error while getting file stats \n");
+    exit(1);
+  }
+  if (strlen(value) == 0) {
+    return S_ISDIR(dir_stat.st_mode);
+  } else {
+    return (S_ISDIR(dir_stat.st_mode) && filter_name(dirname, value));
+  }
+}
+
+bool filter_perms(char *path, long value) {
+  struct stat file_stat;
+  if (stat(path, &file_stat) == -1) {
+    fprintf(stderr, "Error while getting file stats \n");
+    exit(1);
+  }
+  return ((long)(file_stat.st_mode & 0xfff) == value);
 }
