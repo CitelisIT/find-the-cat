@@ -226,7 +226,7 @@ FilterList *flags_to_filters(FlagsList *flags) {
         fprintf(stderr, "%s is not a valid permission value\n", value);
         exit(1);
       } else {
-        num_value = atol(value);
+        num_value = strtol(value, NULL, 8);
         add_filter_numeric(filters, FILTER_PERMS, num_value);
       }
       break;
