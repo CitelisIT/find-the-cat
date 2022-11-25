@@ -1,6 +1,7 @@
 #include "filters.h"
 #include "../lib/MegaMimes.h"
 #include "context.h"
+#include "filesystem.h"
 #include "flags.h"
 #include <ctype.h>
 #include <fts.h>
@@ -315,13 +316,19 @@ bool filter_name(char *filename, char *value) {
   regex_t regex;
   int match_res;
   char buff[128];
-
+  char *name_position = strrchr(filename, PATH_SEP_CHAR);
+  char *name;
+  if (name_position == NULL || strcmp(name_position, "\0") == 0) {
+    name = filename;
+  } else {
+    name = name_position + 1;
+  }
   if ((match_res = regcomp(&regex, value, 0))) {
     regerror(match_res, &regex, buff, 128);
     fprintf(stderr, "Regex not compiled : %s\n", buff);
     exit(1);
   }
-  match_res = regexec(&regex, filename, 0, NULL, 0);
+  match_res = regexec(&regex, name, 0, NULL, 0);
   regfree(&regex);
   if (match_res == REG_NOMATCH) {
     return false;

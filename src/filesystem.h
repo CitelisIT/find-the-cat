@@ -9,8 +9,10 @@
 
 #ifdef _WIN32
 #define PATH_SEP "\\"
+#define PATH_SEP_CHAR '\\'
 #else
 #define PATH_SEP "/"
+#define PATH_SEP_CHAR '/'
 #endif
 
 char *join_path(const char *base, const char *filename);
