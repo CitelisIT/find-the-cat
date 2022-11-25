@@ -1,6 +1,8 @@
 #ifndef _FILTERS_H_
 #define _FILTERS_H_
 
+#define _GNU_SOURCE
+
 #include "flags.h"
 #include <stdbool.h>
 #include <time.h>

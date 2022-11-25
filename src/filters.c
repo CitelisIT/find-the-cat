@@ -24,8 +24,10 @@ void destroy_filter_list(FilterList *list) {
   while (list != NULL) {
     tmp = list;
     list = list->next;
-    free(tmp->data->argument);
-    free(tmp->data);
+    if (tmp->data != NULL) {
+      free(tmp->data->argument);
+      free(tmp->data);
+    }
     free(tmp);
   }
 }
@@ -381,8 +383,9 @@ bool filter_mime(char *path, char *mimetype) {
   if (mime == NULL) {
     return false;
   } else {
-
-    return strcmp(mime, mimetype) == 0;
+    int slash_index = strchrnul(mime, '/') - mime;
+    char *base = strndupa(mime, slash_index);
+    return (strcmp(base, mimetype) == 0) || (strcmp(mime, mimetype) == 0);
   }
 }
 
