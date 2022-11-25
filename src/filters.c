@@ -3,6 +3,7 @@
 #include "context.h"
 #include "flags.h"
 #include <ctype.h>
+#include <fts.h>
 #include <regex.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,6 +24,7 @@ void destroy_filter_list(FilterList *list) {
   while (list != NULL) {
     tmp = list;
     list = list->next;
+    free(tmp->data->argument);
     free(tmp->data);
     free(tmp);
   }
@@ -373,9 +375,15 @@ bool filter_date_lt(char *path, time_t date) {
   return (actual_time - file_stat.st_mtime) < date;
 }
 
-bool filter_mime(char *path, char *mimetime) {
+bool filter_mime(char *path, char *mimetype) {
+
   char *mime = getMegaMimeType(path);
-  return strcmp(mime, mimetime) == 0;
+  if (mime == NULL) {
+    return false;
+  } else {
+
+    return strcmp(mime, mimetype) == 0;
+  }
 }
 
 bool filter_ctc(char *path, char *ctc) {
