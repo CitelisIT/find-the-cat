@@ -397,49 +397,69 @@ bool filter_mime(char *path, char *mimetype) {
 }
 
 bool filter_ctc(char *path, char *ctc) {
-  char *buffer = 0;
-  long length;
 
-  FILE *file = fopen(path, "rb");
+  struct stat path_stat;
 
-  if (file) {
-    fseek(file, 0, SEEK_END);
-    length = ftell(file);
-    fseek(file, 0, SEEK_SET);
-    buffer = malloc(length);
-    if (buffer) {
-      fread(buffer, 1, length, file);
-    }
-    fclose(file);
-  } else {
-    fprintf(stderr, "Error while opening file %s\n", path);
-    exit(1);
-  }
+  stat(path, &path_stat);
 
-  if (buffer) {
-    regex_t regex;
-    int match_res;
-    char buff[128];
-
-    if ((match_res = regcomp(&regex, ctc, 0))) {
-      regerror(match_res, &regex, buff, 128);
-      fprintf(stderr, "Regex not compiled : %s\n", buff);
+  if (!S_ISDIR(path_stat.st_mode)) {
+    FILE *file = fopen(path, "r");
+    if (file == NULL) {
+      fprintf(stderr, "Error while opening file %s", path);
       exit(1);
     }
-    match_res = regexec(&regex, path, 0, NULL, 0);
-    regfree(&regex);
-    free(buffer);
-    if (match_res == REG_NOMATCH) {
-      return false;
-    } else {
-      return true;
+
+    fseek(file, 0, SEEK_END);
+    int length = ftell(file);
+
+    fseek(file, 0, SEEK_SET);
+
+    char *buffer = malloc(sizeof(char) * (length + 1));
+
+    char c;
+    int i = 0;
+    while ((c = fgetc(file)) != EOF) {
+      buffer[i] = c;
+      i++;
+    }
+    buffer[i] = '\0';
+    fclose(file);
+
+    int spaces = 0;
+    int j = 0;
+    while (buffer[j] != '\0') {
+      if (buffer[j] == ' ') {
+        spaces++;
+      }
+      j++;
+    }
+
+    if (buffer) {
+      regex_t regex;
+      int match_res;
+      char buff[128];
+
+      if ((match_res = regcomp(&regex, ctc, 0))) {
+        regerror(match_res, &regex, buff, 128);
+        fprintf(stderr, "Regex not compiled : %s\n", buff);
+        exit(1);
+      }
+      match_res = regexec(&regex, buffer, 0, NULL, 0);
+      regfree(&regex);
+      free(buffer);
+      if (match_res == REG_NOMATCH) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+
+    else {
+      fprintf(stderr, "Error while reading file %s\n", path);
+      exit(1);
     }
   }
-
-  else {
-    fprintf(stderr, "Error while reading file %s\n", path);
-    exit(1);
-  }
+  return false;
 }
 
 bool filter_dir(char *dirname, char *value) {
