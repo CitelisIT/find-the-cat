@@ -425,15 +425,6 @@ bool filter_ctc(char *path, char *ctc) {
     buffer[i] = '\0';
     fclose(file);
 
-    int spaces = 0;
-    int j = 0;
-    while (buffer[j] != '\0') {
-      if (buffer[j] == ' ') {
-        spaces++;
-      }
-      j++;
-    }
-
     if (buffer) {
       regex_t regex;
       int match_res;
