@@ -472,5 +472,9 @@ bool filter_perms(char *path, long value) {
     fprintf(stderr, "Error while getting file stats \n");
     exit(1);
   }
-  return ((long)(file_stat.st_mode & 0xfff) == value);
+  if (!S_ISDIR(file_stat.st_mode)) {
+    return ((long)(file_stat.st_mode & 0xfff) == value);
+  } else {
+    return false;
+  }
 }
