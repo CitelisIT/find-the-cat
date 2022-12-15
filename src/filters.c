@@ -371,7 +371,7 @@ bool filter_date_gt(char *path, time_t date) {
     exit(1);
   }
   time_t actual_time = time(NULL);
-  return (actual_time - file_stat.st_mtime) > date;
+  return (actual_time - file_stat.st_atime) > date;
 }
 
 bool filter_date_lt(char *path, time_t date) {
@@ -381,7 +381,7 @@ bool filter_date_lt(char *path, time_t date) {
     exit(1);
   }
   time_t actual_time = time(NULL);
-  return (actual_time - file_stat.st_mtime) < date;
+  return (actual_time - file_stat.st_atime) < date;
 }
 
 bool filter_mime(char *path, char *mimetype) {
