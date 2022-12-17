@@ -1,5 +1,6 @@
 #define _GNU_SOURCE
 #include "filesystem.h"
+#include "color.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -43,7 +44,7 @@ void find_matching_files(char *path, FilterList *filters) {
         find_matching_files(joined_path, filters);
       } else {
         if (all_filters_match(joined_path, filters)) {
-          printf("%s\n", joined_path);
+          print_filename(joined_path);
         }
 
         free(joined_path);

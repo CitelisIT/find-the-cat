@@ -112,7 +112,6 @@ bool _is_perm(char *value) {
 
 FilterList *flags_to_filters(FlagsList *flags) {
   FilterList *filters = create_filter_list();
-  int _true = 1;
   long num_value;
   char *unit;
   char *value;

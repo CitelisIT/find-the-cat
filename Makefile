@@ -4,7 +4,7 @@ CPPFLAGS=-I/include
 CFLAGS=-std=c99 -Wall -Wextra -pedantic -fdiagnostics-color=always
 CFLAGS+=$(CPPFLAGS) -O0 -g3 -Qunused-arguments # -DNDEBUG
 
-OBJS=src/main.o src/flags.o src/filesystem.o src/errors.o src/filters.o src/context.o lib/MegaMimes.o
+OBJS=src/main.o src/flags.o src/filesystem.o src/errors.o src/filters.o src/context.o src/color.o lib/MegaMimes.o
 OUT=ftc
 
 install: $(OBJS) $(OUT)
