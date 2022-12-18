@@ -1,9 +1,13 @@
+#define _ATFILE_SOURCE
+
+
 #include "filters.h"
 #include "../lib/MegaMimes.h"
 #include "context.h"
 #include "filesystem.h"
 #include "flags.h"
 #include <ctype.h>
+#include <fcntl.h>  
 #include <fts.h>
 #include <regex.h>
 #include <stdio.h>
@@ -342,6 +346,13 @@ bool filter_size_eq(char *path, long value) {
     fprintf(stderr, "Error while getting file stats \n");
     exit(1);
   }
+  if (S_ISLNK(file_stat.st_mode)) {
+    if (fstatat(AT_FDCWD, path, &file_stat, 0) == -1) {
+      fprintf(stderr, "Error while getting file stats \n");
+      exit(1);
+    }
+    return file_stat.st_size == value;
+  }
   return file_stat.st_size == value;
 }
 
@@ -351,6 +362,13 @@ bool filter_size_gt(char *path, long value) {
     fprintf(stderr, "Error while getting file stats \n");
     exit(1);
   }
+  if (S_ISLNK(file_stat.st_mode)) {
+    if (fstatat(AT_FDCWD, path, &file_stat, 0) == -1) {
+      fprintf(stderr, "Error while getting file stats \n");
+      exit(1);
+    }
+    return file_stat.st_size > value;
+  }
   return file_stat.st_size > value;
 }
 
@@ -359,6 +377,13 @@ bool filter_size_lt(char *path, long value) {
   if (stat(path, &file_stat) == -1) {
     fprintf(stderr, "Error while getting file stats \n");
     exit(1);
+  }
+  if (S_ISLNK(file_stat.st_mode)) {
+    if (fstatat(AT_FDCWD, path, &file_stat,0) == -1) {
+      fprintf(stderr, "Error while getting file stats \n");
+      exit(1);
+    }
+    return file_stat.st_size < value;
   }
   return file_stat.st_size < value;
 }
@@ -370,6 +395,14 @@ bool filter_date_gt(char *path, time_t date) {
     exit(1);
   }
   time_t actual_time = time(NULL);
+
+  if (S_ISLNK(file_stat.st_mode)) {
+    if (fstatat(AT_FDCWD, path, &file_stat, 0) == -1) {
+      fprintf(stderr, "Error while getting file stats \n");
+      exit(1);
+    }
+    return (actual_time - file_stat.st_atime) > date;
+  }
   return (actual_time - file_stat.st_atime) > date;
 }
 
@@ -380,10 +413,33 @@ bool filter_date_lt(char *path, time_t date) {
     exit(1);
   }
   time_t actual_time = time(NULL);
+
+  if (S_ISLNK(file_stat.st_mode)) {
+    if (fstatat(AT_FDCWD, path, &file_stat, 0) == -1) {
+      fprintf(stderr, "Error while getting file stats \n");
+      exit(1);
+    }
+    return (actual_time - file_stat.st_atime) < date;
+  }
   return (actual_time - file_stat.st_atime) < date;
 }
 
 bool filter_mime(char *path, char *mimetype) {
+
+  struct stat file_stat;
+  if (stat(path, &file_stat) == -1) {
+    fprintf(stderr, "Error while getting file stats \n");
+    exit(1);
+  }
+  if (S_ISLNK(file_stat.st_mode)){
+    char *real_path = realpath(path, NULL);
+    if (realpath == NULL) {
+      fprintf(stderr, "Error while getting real path of %s", path);
+      exit(1);
+    }
+    return filter_mime(realpath, mimetype);
+  }
+
 
   const char *mime = getMegaMimeType(path);
   if (mime == NULL) {
@@ -402,6 +458,14 @@ bool filter_ctc(char *path, char *ctc) {
   stat(path, &path_stat);
 
   if (!S_ISDIR(path_stat.st_mode)) {
+    if (S_ISLNK(path_stat.st_mode)) {
+      char *real_path = realpath(path, NULL);
+      if (real_path == NULL) {
+        fprintf(stderr, "Error while getting real path of %s", path);
+        exit(1);
+      }
+      return filter_ctc(real_path, ctc);
+    } else {
     FILE *file = fopen(path, "r");
     if (file == NULL) {
       fprintf(stderr, "Error while opening file %s", path);
@@ -442,14 +506,14 @@ bool filter_ctc(char *path, char *ctc) {
       } else {
         return true;
       }
-    }
-
+  }
     else {
       fprintf(stderr, "Error while reading file %s\n", path);
       exit(1);
     }
   }
   return false;
+}
 }
 
 bool filter_dir(char *dirname, char *value) {
@@ -472,6 +536,13 @@ bool filter_perms(char *path, long value) {
     exit(1);
   }
   if (!S_ISDIR(file_stat.st_mode)) {
+    if (S_ISLNK(file_stat.st_mode)) {
+    if (fstatat(AT_FDCWD, path, &file_stat, 0) == -1) {
+      fprintf(stderr, "Error while getting file stats \n");
+      exit(1);
+    }
+    return ((long)(file_stat.st_mode & 0xfff) == value);
+  }
     return ((long)(file_stat.st_mode & 0xfff) == value);
   } else {
     return false;
