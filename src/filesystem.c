@@ -28,7 +28,7 @@ char *join_path(const char *base, const char *filename) {
 
 void find_matching_files(char *path, FilterList *filters) {
   if (all_filters_match(path, filters))
-    printf("%s\n", path);
+    print_filename(path);
   DIR *dirp = opendir(path);
   char *filename;
   if (dirp == NULL) {

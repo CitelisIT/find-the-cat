@@ -385,7 +385,7 @@ bool filter_date_lt(char *path, time_t date) {
 
 bool filter_mime(char *path, char *mimetype) {
 
-  char *mime = getMegaMimeType(path);
+  const char *mime = getMegaMimeType(path);
   if (mime == NULL) {
     return false;
   } else {

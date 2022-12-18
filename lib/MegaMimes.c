@@ -688,6 +688,7 @@ const char *MegaMimeTypes[][COMPONENTS_NUMBER] = {
     {"*.jpe", "Raw JPEG Stream", "image/jpeg", "0"},
     {"*.jpf", "JPX (JPEG 2000 part 2)", "image/jpx", "0"},
     {"*.jpg", "Joint Photographic Experts Group", "image/jpeg", "0"},
+    {"*.jpeg", "Joint Photographic Experts Group", "image/jpeg", "0"},
     {"*.jpm", "JPEG 2000 Part 6 (JPM)", "image/jpm", "0"},
     {"*.jq", "JSONiq", "application/json", "0"},
     {"*.js", "JavaScript Source Code", "application/javascript", "0"},
